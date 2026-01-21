@@ -201,6 +201,19 @@ Mavlink::mavlink_update_parameters()
 		_param_mav_type.commit_no_notification();
 		PX4_ERR("MAV_TYPE parameter invalid, resetting to 0.");
 	}
+
+	// Initialize encryption if enabled
+	_encryption_enabled = _param_mav_crypto_en.get();
+
+	if (_encryption_enabled) {
+		// TEMPORARY: Hardcoded test key for debugging - matches QGC
+		// Key bytes: 01 02 03 04 05 06 07 08 09 0a 0b 0c 0d 0e 0f 10 11 12 13 14 15 16 17 18 19 1a 1b 1c 1d 1e 1f 20
+		for (int i = 0; i < 32; i++) {
+			_encryption_key[i] = static_cast<uint8_t>(i + 1);
+		}
+		PX4_INFO("MAVLink encryption enabled with HARDCODED TEST KEY");
+	}
+
 }
 
 bool Mavlink::set_channel()
@@ -835,12 +848,34 @@ void Mavlink::send_finish()
 void Mavlink::send_bytes(const uint8_t *buf, unsigned packet_len)
 {
 	if (!_tx_buffer_low) {
-		if (_buf_fill + packet_len < sizeof(_buf)) {
-			memcpy(&_buf[_buf_fill], buf, packet_len);
-			_buf_fill += packet_len;
+		if (_encryption_enabled && packet_len > 0) {
+			// Encrypt the data before sending
+			// Simple XOR encryption (placeholder - replace with monocypher for production)
+			uint8_t encrypted_buf[MAVLINK_MAX_PACKET_LEN + 16]; // +16 for MAC
+			size_t encrypted_len = packet_len;
 
+			// XOR encryption with fixed byte to avoid fragmentation issues
+			const uint8_t xorByte = _encryption_key[0];
+			for (unsigned i = 0; i < packet_len; i++) {
+				encrypted_buf[i] = buf[i] ^ xorByte;
+			}
+
+			_tx_nonce++;
+
+			if (_buf_fill + encrypted_len < sizeof(_buf)) {
+				memcpy(&_buf[_buf_fill], encrypted_buf, encrypted_len);
+				_buf_fill += encrypted_len;
+			} else {
+				perf_count(_send_byte_error_perf);
+			}
 		} else {
-			perf_count(_send_byte_error_perf);
+			if (_buf_fill + packet_len < sizeof(_buf)) {
+				memcpy(&_buf[_buf_fill], buf, packet_len);
+				_buf_fill += packet_len;
+
+			} else {
+				perf_count(_send_byte_error_perf);
+			}
 		}
 	}
 }

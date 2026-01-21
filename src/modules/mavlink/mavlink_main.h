@@ -86,6 +86,9 @@
 #include "mavlink_shell.h"
 #include "mavlink_ulog.h"
 
+// MAVLink encryption is implemented inline without depending on crypto_backend
+// This allows building on POSIX without the full crypto subsystem
+
 #define DEFAULT_BAUD_RATE       57600
 #define DEFAULT_DEVICE_NAME     "/dev/ttyS1"
 
@@ -322,6 +325,17 @@ public:
 	int			get_instance_id() const { return _instance_id; }
 
 	/**
+	 * Check if encryption is enabled
+	 */
+	bool			encryption_enabled() const { return _encryption_enabled; }
+
+	/**
+	 * Get the encryption key
+	 */
+	const uint8_t*		encryption_key() const { return _encryption_key; }
+
+	/**
+
 	 * Enable / disable hardware flow control.
 	 *
 	 * @param enabled	True if hardware flow control should be enabled
@@ -617,6 +631,13 @@ private:
 
 	ping_statistics_s	_ping_stats {};
 
+	/* MAVLink Encryption state */
+	bool			_encryption_enabled{false};
+	uint8_t			_encryption_key[32]{};
+	uint64_t		_tx_nonce{0};
+	uint64_t		_rx_nonce{0};
+
+
 	pthread_mutex_t		_message_buffer_mutex{};
 	VariableLengthRingbuffer _message_buffer{};
 
@@ -635,7 +656,16 @@ private:
 		(ParamBool<px4::params::MAV_HB_FORW_EN>) _param_mav_hb_forw_en,
 		(ParamInt<px4::params::MAV_RADIO_TOUT>)      _param_mav_radio_timeout,
 		(ParamInt<px4::params::SYS_HITL>) _param_sys_hitl,
-		(ParamBool<px4::params::SYS_FAILURE_EN>) _param_sys_failure_injection_enabled
+		(ParamBool<px4::params::SYS_FAILURE_EN>) _param_sys_failure_injection_enabled,
+		(ParamBool<px4::params::MAV_CRYPTO_EN>) _param_mav_crypto_en,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY0>) _param_mav_crypto_key0,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY1>) _param_mav_crypto_key1,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY2>) _param_mav_crypto_key2,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY3>) _param_mav_crypto_key3,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY4>) _param_mav_crypto_key4,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY5>) _param_mav_crypto_key5,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY6>) _param_mav_crypto_key6,
+		(ParamInt<px4::params::MAV_CRYPTO_KEY7>) _param_mav_crypto_key7
 	)
 
 	perf_counter_t _loop_perf{perf_alloc(PC_ELAPSED, MODULE_NAME": tx run elapsed")};                      /**< loop performance counter */

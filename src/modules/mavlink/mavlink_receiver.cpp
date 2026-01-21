@@ -3221,8 +3221,17 @@ MavlinkReceiver::run()
 			if (_mavlink.get_protocol() != Protocol::UDP || _mavlink.get_client_source_initialized()) {
 #endif // MAVLINK_UDP
 
+				// Decrypt received data if encryption is enabled
+				if (nread > 0 && _mavlink.encryption_enabled()) {
+					const uint8_t xorByte = _mavlink.encryption_key()[0];
+					for (ssize_t i = 0; i < nread; i++) {
+						buf[i] ^= xorByte;
+					}
+				}
+
 				/* if read failed, this loop won't execute */
 				for (ssize_t i = 0; i < nread; i++) {
+
 					if (mavlink_parse_char(_mavlink.get_channel(), buf[i], &msg, &_status)) {
 
 						// If we receive a complete MAVLink 2 packet, also switch the outgoing protocol version

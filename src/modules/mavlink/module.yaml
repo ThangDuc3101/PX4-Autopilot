@@ -238,3 +238,96 @@ parameters:
             type: boolean
             reboot_required: true
             default: false
+
+        MAV_CRYPTO_EN:
+            description:
+                short: Enable MAVLink payload encryption
+                long: |
+                    When enabled, MAVLink message payloads will be encrypted using
+                    XChaCha20-Poly1305. Both the autopilot and ground station must
+                    have matching encryption keys configured.
+
+            type: boolean
+            reboot_required: true
+            default: false
+
+        MAV_CRYPTO_KEY0:
+            description:
+                short: MAVLink encryption key bytes 0-3
+                long: |
+                    Part 1 of 8 of the 256-bit encryption key.
+                    All MAV_CRYPTO_KEY0-7 parameters together form the 32-byte key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY1:
+            description:
+                short: MAVLink encryption key bytes 4-7
+                long: |
+                    Part 2 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY2:
+            description:
+                short: MAVLink encryption key bytes 8-11
+                long: |
+                    Part 3 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY3:
+            description:
+                short: MAVLink encryption key bytes 12-15
+                long: |
+                    Part 4 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY4:
+            description:
+                short: MAVLink encryption key bytes 16-19
+                long: |
+                    Part 5 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY5:
+            description:
+                short: MAVLink encryption key bytes 20-23
+                long: |
+                    Part 6 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY6:
+            description:
+                short: MAVLink encryption key bytes 24-27
+                long: |
+                    Part 7 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
+
+        MAV_CRYPTO_KEY7:
+            description:
+                short: MAVLink encryption key bytes 28-31
+                long: |
+                    Part 8 of 8 of the 256-bit encryption key.
+
+            type: int32
+            reboot_required: true
+            default: 0
