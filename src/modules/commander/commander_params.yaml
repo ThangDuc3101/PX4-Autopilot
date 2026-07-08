@@ -11,7 +11,7 @@ parameters:
       default: 10
       unit: s
       min: 5
-      max: 300
+      max: 1800
       decimal: 1
       increment: 1
     COM_HLDL_LOSS_T:
@@ -35,7 +35,7 @@ parameters:
       default: 0.5
       unit: s
       min: 0
-      max: 35
+      max: 120
       decimal: 1
       increment: 0.1
     COM_HOME_EN:
